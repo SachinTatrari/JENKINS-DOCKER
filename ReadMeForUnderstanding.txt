@@ -139,3 +139,19 @@ exit
 Restart the container:
 docker restart jenkins
 
+Still it was giving the error so updated the dockerfile to have jenkins user added to the root group
+
+FROM jenkins/jenkins:lts
+
+USER root
+
+# Add jenkins user to root group (GID 0) to access docker.sock
+RUN usermod -aG root jenkins \
+    && apt-get update \
+    && apt-get install -y docker.io docker-compose \
+    && apt-get clean
+
+USER jenkins
+
+
+So this is the Jenkins container running in docker and now we would be creating a pipeline in this container, that would pull up the node+mongo app present in diff github repo. It will check the Jenkinsfile there and will run tests and deploy the app. Basically doing CI/CD.
